@@ -4,13 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"strings"
 )
 
 func setRootDirectory() string {
 	var pwd directory
-	dir := directory.getwd()
+	dir := pwd.getWorkingDir()
 
 	// check for typo3conf
 	if strings.Contains(dir, "typo3conf") {
@@ -18,7 +17,7 @@ func setRootDirectory() string {
 		dir = temp[0]
 	}
 
-	if dir.isGitDirPath {
+	if pwd.isGitDirPath() {
 		return dir
 	}
 	log.Fatal("No root directory found")
@@ -27,7 +26,6 @@ func setRootDirectory() string {
 
 func main() {
 	st := flag.Bool("st", false, "print status")
-	//co := flag.String("co", ".", "Checkout")
 	br := flag.Bool("br", false, "show branches")
 	flag.Parse()
 

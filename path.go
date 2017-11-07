@@ -1,10 +1,14 @@
 package main
 
+import (
+	"os"
+)
+
 type directory struct {
 	absolutePath string
 }
 
-func (path directory) getwd() string {
+func (path directory) getWorkingDir() string {
 	path.abs, _ = os.Getwd()
 
 	return path.absolutePath
