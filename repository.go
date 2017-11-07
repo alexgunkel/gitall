@@ -8,18 +8,22 @@ import (
 	"strings"
 )
 
+type branch struct {
+	name string
+}
+
 type repository struct {
-	dir           string
+	dir           path
 	status        string
-	currentBranch string
+	currentBranch branch
 	projectType   string
-	branches      []string
+	branches      []branch
 	children      []repository
 }
 
 func (repo repository) runGitCommand(param ...string) string {
 	curDir, _ := os.Getwd()
-	os.Chdir(repo.dir)
+	os.Chdir(repo.dir.String())
 	defer os.Chdir(curDir)
 
 	cmd := exec.Command("git", param...)
@@ -36,9 +40,9 @@ func (repo *repository) getStatus() string {
 	return repo.status
 }
 
-func (repo *repository) getBranches() []string {
+func (repo *repository) getBranches() []branch {
 	branches := strings.Split(repo.runGitCommand("branch"), "\n")
-	var result []string
+	var result []branch
 	for _, value := range branches {
 		isMaster := false
 		if strings.Contains(value, "*") {
@@ -46,10 +50,10 @@ func (repo *repository) getBranches() []string {
 		}
 		tempName := strings.Trim(value, " *")
 		if len(tempName) > 0 {
-			result = append(result, tempName)
+			result = append(result, branch{tempName})
 		}
 		if isMaster {
-			repo.currentBranch = tempName
+			repo.currentBranch = branch{tempName}
 		}
 	}
 	repo.branches = result
@@ -58,7 +62,7 @@ func (repo *repository) getBranches() []string {
 }
 
 func (repo *repository) setProjectType() {
-	if _, err := os.Stat(repo.dir + "/typo3conf"); err == nil {
+	if _, err := os.Stat(repo.dir.add("/typo3conf").String()); err == nil {
 		repo.projectType = "TYPO3"
 	}
 }
@@ -66,7 +70,7 @@ func (repo *repository) setProjectType() {
 func (repo *repository) findChildren() (result []repository) {
 	if repo.projectType != "TYPO3" {
 		tempDir, _ := os.Getwd()
-		os.Chdir(repo.dir + "/typo3conf/ext/")
+		os.Chdir(repo.dir.add("/typo3conf/ext/").String())
 		defer os.Chdir(tempDir)
 
 	}

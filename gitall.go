@@ -12,16 +12,17 @@ func setRootDirectory() string {
 	dir := pwd.getWorkingDir()
 
 	// check for typo3conf
-	if strings.Contains(dir, "typo3conf") {
-		temp := strings.Split(dir, "/typo3conf")
-		dir = temp[0]
+	if strings.Contains(dir.String(), "typo3conf") {
+		temp := strings.Split(dir.String(), "/typo3conf")
+		return temp[0]
 	}
 
-	if pwd.isGitDirPath() {
-		return dir
-	}
 	log.Fatal("No root directory found")
 	return ""
+}
+
+func createRepository(rootDir string) *repository  {
+	return new(repository)
 }
 
 func main() {
@@ -32,12 +33,12 @@ func main() {
 	project := createRepository(setRootDirectory())
 
 	if *br {
-		project.getBranches()
+		fmt.Print(project.dir.String() + ": ")
+		fmt.Println(project.getBranches())
 	}
 
 	if *st {
-		project.getStatus()
+		fmt.Print(project.dir.String() + ": ")
+		fmt.Println(project.getStatus())
 	}
-
-	fmt.Println(*project)
 }

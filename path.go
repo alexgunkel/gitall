@@ -4,28 +4,42 @@ import (
 	"os"
 )
 
+type path struct {
+	c string
+}
+
+func (p path) add(s string) path {
+	return path{p.c + s}
+}
+
+func (p path) String() string {
+	return p.c
+}
+
 type directory struct {
-	absolutePath string
+	absolutePath path
 }
 
-func (path directory) getWorkingDir() string {
-	path.abs, _ = os.Getwd()
+func (dir directory) getWorkingDir() path {
+	var tmp string
+	tmp, _ = os.Getwd()
+	dir.absolutePath = path{tmp}
 
-	return path.absolutePath
+	return dir.absolutePath
 }
 
-func (path directory) isGitDirPath() bool {
-	gitDir := path + "/.git"
-	if _, err := os.Stat(gitDir); os.IsNotExist(err) {
+func (dir directory) isGitDirPath() bool {
+	gitDir := dir.absolutePath.add("/.git")
+	if _, err := os.Stat(gitDir.String()); os.IsNotExist(err) {
 		return false
 	}
 
 	return true
 }
 
-func (path directory) createRepository() (repo *repository) {
+func (dir directory) createRepository() (repo *repository) {
 	repo = new(repository)
-	repo.dir = path
+	repo.dir = dir.absolutePath
 	repo.setProjectType()
 
 	return
