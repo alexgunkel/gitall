@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"github.com/alexgunkel/git"
 )
 
 func setRootDirectory() string {
-	var pwd directory
-	dir := pwd.getWorkingDir()
+	var pwd git.Directory
+	dir := pwd.WorkingDir()
 
 	// check for typo3conf
 	if strings.Contains(dir.String(), "typo3conf") {
@@ -21,8 +22,8 @@ func setRootDirectory() string {
 	return ""
 }
 
-func createRepository(rootDir string) *repository  {
-	return new(repository)
+func createRepository(rootDir string) *git.Repository  {
+	return new(git.Repository)
 }
 
 func main() {
@@ -33,12 +34,12 @@ func main() {
 	project := createRepository(setRootDirectory())
 
 	if *br {
-		fmt.Print(project.dir.String() + ": ")
-		fmt.Println(project.getBranches())
+		fmt.Print(project.Dir() + ": ")
+		fmt.Println(project.Branches())
 	}
 
 	if *st {
-		fmt.Print(project.dir.String() + ": ")
-		fmt.Println(project.getStatus())
+		fmt.Print(project.Dir() + ": ")
+		fmt.Println(project.Status())
 	}
 }
